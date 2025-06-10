@@ -10,6 +10,7 @@ const Home = () => (
       <Link to="/register" className="home-link">Register</Link>
       <Link to="/about" className="home-link">About Us</Link>
       <Link to="/contact" className="home-link">Contact Us</Link>
+      <Link to="/join" className="home-link">Join Us</Link>
     </div>
   </div>
 );

@@ -11,6 +11,7 @@ import ManagerPage from './pages/ManagerPage';
 import EmployeePage from './pages/EmployeePage';
 import ApplicantPage from './pages/ApplicantPage';
 import AddAccount from './pages/AddAccount';  // <-- Import AddAccount
+import JoinUs from './pages/JoinUs';          // <-- Import JoinUs
 import './App.css';
 
 // Role-based Protected Route Component
@@ -34,6 +35,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
+          <Route path="/join" element={<JoinUs />} /> {/* <-- Added JoinUs route */}
 
           {/* Role-based protected routes */}
           <Route path="/admin" element={<ProtectedRoute element={AdminPage} role="Admin" />} />

@@ -5,6 +5,7 @@ const mysql = require('mysql2');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const bodyParser = require('body-parser');
+const multer = require('multer');
 
 const app = express();
 const PORT = 5005;
@@ -15,6 +16,10 @@ const JWT_SECRET = 'your_strong_secret_key'; // Change this in production
 // Middleware
 app.use(cors());
 app.use(bodyParser.json());
+
+// In-memory file handling
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 // MySQL Connection
 const db = mysql.createConnection({
@@ -31,7 +36,6 @@ db.connect((err) => {
   }
   console.log('Connected to MySQL database.');
 });
-
 
 // -------------------- REGISTER ROUTE --------------------
 app.post('/api/auth/register', (req, res) => {
@@ -59,7 +63,6 @@ app.post('/api/auth/register', (req, res) => {
   });
 });
 
-
 // -------------------- LOGIN ROUTE --------------------
 app.post('/api/auth/login', (req, res) => {
   const { username, password } = req.body;
@@ -77,17 +80,19 @@ app.post('/api/auth/login', (req, res) => {
 
     const user = results[0];
 
-    // ✅ Check if account is deactivated
     if (!user.IsActive) {
       return res.status(403).json({ message: 'Your account has been deactivated. Please contact the admin.' });
     }
+
     const isMatch = bcrypt.compareSync(password, user.Password);
     if (!isMatch) return res.status(401).json({ message: 'Invalid credentials' });
+
     const token = jwt.sign(
       { id: user.ID, username: user.Username, role: user.Role },
       JWT_SECRET,
       { expiresIn: '1h' }
     );
+
     res.json({
       message: 'Login successful',
       token,
@@ -96,7 +101,7 @@ app.post('/api/auth/login', (req, res) => {
   });
 });
 
-
+// -------------------- ACCOUNT LISTING --------------------
 app.get('/api/accounts', (req, res) => {
   const sql = `
     SELECT ID, FullName, PhoneNumber, Email, Role, Username, IsActive 
@@ -115,7 +120,6 @@ app.get('/api/accounts', (req, res) => {
 app.put('/api/accounts/:id/status', (req, res) => {
   const accountId = req.params.id;
 
-  // Fetch current status
   db.query('SELECT IsActive FROM account WHERE ID = ?', [accountId], (err, results) => {
     if (err || results.length === 0) {
       return res.status(404).json({ message: 'Account not found' });
@@ -135,8 +139,7 @@ app.put('/api/accounts/:id/status', (req, res) => {
   });
 });
 
-
-// -------------------- TOKEN VERIFICATION (optional) --------------------
+// -------------------- PROTECTED TEST ROUTE --------------------
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader?.split(' ')[1];
@@ -150,12 +153,56 @@ function authenticateToken(req, res, next) {
   });
 }
 
-
-// -------------------- TEST PROTECTED ROUTE --------------------
 app.get('/api/protected', authenticateToken, (req, res) => {
   res.json({ message: `Hello ${req.user.username}, your role is ${req.user.role}` });
 });
 
+// -------------------- JOIN US ROUTE (CV Upload) --------------------
+app.post('/api/joinus', upload.fields([
+  { name: 'workExperience' },
+  { name: 'schoolExperience' },
+  { name: 'organizationalExperience' },
+  { name: 'profileDescription' },
+  { name: 'otherExperience' },
+  { name: 'certificate' },
+]), (req, res) => {
+  const { fullName, address } = req.body;
+  const files = req.files;
+
+  if (!fullName || !address || !files) {
+    return res.status(400).json({ message: 'Missing required fields or files' });
+  }
+
+  const sql = `
+    INSERT INTO cv (
+      full_name,
+      address,
+      work_experience,
+      school_experience,
+      organizational_experience,
+      profile_description,
+      other_experience,
+      certificate
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.query(sql, [
+    fullName,
+    address,
+    files.workExperience?.[0]?.buffer || null,
+    files.schoolExperience?.[0]?.buffer || null,
+    files.organizationalExperience?.[0]?.buffer || null,
+    files.profileDescription?.[0]?.buffer || null,
+    files.otherExperience?.[0]?.buffer || null,
+    files.certificate?.[0]?.buffer || null,
+  ], (err, result) => {
+    if (err) {
+      console.error('Insert error:', err);
+      return res.status(500).json({ message: 'Failed to submit application', error: err });
+    }
+    res.status(201).json({ message: 'Application submitted successfully' });
+  });
+});
 
 // -------------------- START SERVER --------------------
 app.listen(PORT, () => {

@@ -6,25 +6,24 @@ const JoinUs = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     address: '',
-    workExperience: null,
-    schoolExperience: null,
-    orgExperience: null,
-    profileDescription: null,
-    otherExperience: null,
-    certificate: null
+    workExperience: '',
+    schoolExperience: '',
+    orgExperience: '',
+    profileDescription: '',
+    otherExperience: '',
+    certificate: ''
   });
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: files ? files[0] : value
+      [name]: value
     }));
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Normally you'd send the form data to the backend here using FormData
     console.log('Submitted:', formData);
     alert('Application submitted successfully!');
   };
@@ -41,28 +40,28 @@ const JoinUs = () => {
           <input type="text" name="address" value={formData.address} onChange={handleChange} required />
         </label>
 
-        <label>Work Experience (PDF):
-          <input type="file" name="workExperience" onChange={handleChange} accept=".pdf" required />
+        <label>Work Experience:
+          <input type="text" name="workExperience" value={formData.workExperience} onChange={handleChange} required />
         </label>
 
-        <label>School Experience (PDF):
-          <input type="file" name="schoolExperience" onChange={handleChange} accept=".pdf" required />
+        <label>School Experience:
+          <input type="text" name="schoolExperience" value={formData.schoolExperience} onChange={handleChange} required />
         </label>
 
-        <label>Organizational Experience (PDF):
-          <input type="file" name="orgExperience" onChange={handleChange} accept=".pdf" required />
+        <label>Organizational Experience:
+          <input type="text" name="orgExperience" value={formData.orgExperience} onChange={handleChange} required />
         </label>
 
-        <label>Profile Description (PDF):
-          <input type="file" name="profileDescription" onChange={handleChange} accept=".pdf" required />
+        <label>Profile Description:
+          <input type="text" name="profileDescription" value={formData.profileDescription} onChange={handleChange} required />
         </label>
 
-        <label>Other Experience (PDF):
-          <input type="file" name="otherExperience" onChange={handleChange} accept=".pdf" required />
+        <label>Other Experience:
+          <input type="text" name="otherExperience" value={formData.otherExperience} onChange={handleChange} required />
         </label>
 
-        <label>Certificate (PDF):
-          <input type="file" name="certificate" onChange={handleChange} accept=".pdf" required />
+        <label>Certificate:
+          <input type="text" name="certificate" value={formData.certificate} onChange={handleChange} required />
         </label>
 
         <button type="submit">Submit Application</button>

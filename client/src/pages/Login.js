@@ -28,6 +28,7 @@ const Login = () => {
       // Save token and role
       localStorage.setItem('token', data.token);
       localStorage.setItem('userRole', data.user.role);
+      localStorage.setItem('username', data.user.username);
 
       // Redirect based on role
       switch (data.user.role) {

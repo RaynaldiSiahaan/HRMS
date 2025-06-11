@@ -42,7 +42,8 @@ const AdminPage = () => {
           <a href="/add-account" className="add-account-link">Add Account</a>
         </div>
         <div className="links-right">
-          <a href="/fill-attendance">Fill Attendance</a>
+          <a href="/attendance">Fill Attendance</a>
+          <a href="/fill-attendance">Register Face</a>
           <a href="/logout">Logout</a>
         </div>
       </div>

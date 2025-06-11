@@ -2,6 +2,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
+import Attendance from './pages/attendance';
+import RegisterFace from './pages/RegisterFace';
+
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AboutUs from './pages/AboutUs';
@@ -11,7 +14,8 @@ import ManagerPage from './pages/ManagerPage';
 import EmployeePage from './pages/EmployeePage';
 import ApplicantPage from './pages/ApplicantPage';
 import AddAccount from './pages/AddAccount';  // <-- Import AddAccount
-import JoinUs from './pages/JoinUs';          // <-- Import JoinUs
+import JoinUs from './pages/JoinUs';     
+import FillAttendance from './pages/RegisterFace';       // <-- Import JoinUs
 import './App.css';
 
 // Role-based Protected Route Component
@@ -31,18 +35,20 @@ function App() {
       <div className="app-container">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/register-face" element={<RegisterFace />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/contact" element={<ContactUs />} />
           <Route path="/join" element={<JoinUs />} /> {/* <-- Added JoinUs route */}
+          <Route path="/attendance" element={<Attendance />} />
 
           {/* Role-based protected routes */}
           <Route path="/admin" element={<ProtectedRoute element={AdminPage} role="Admin" />} />
           <Route path="/manager" element={<ProtectedRoute element={ManagerPage} role="Manager" />} />
           <Route path="/employee" element={<ProtectedRoute element={EmployeePage} role="Employee" />} />
           <Route path="/applicant" element={<ProtectedRoute element={ApplicantPage} role="Applicant" />} />
-
+          <Route path="/fill-attendance" element={<ProtectedRoute element={FillAttendance} role="Admin" />} />
           {/* AddAccount route, protected for Admin only */}
           <Route path="/add-account" element={<ProtectedRoute element={AddAccount} role="Admin" />} />
         </Routes>

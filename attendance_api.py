@@ -103,7 +103,7 @@ def mark_attendance(req: AttendanceRequest, request: Request):
     now = datetime.utcnow()
     with connection.cursor() as cur:
         cur.execute("""
-          INSERT INTO attendance (username, attendance_time, ip_location)
+          INSERT INTO attendance (username, clocked_in_time, ip_location)
           VALUES (%s, %s, %s)
         """, (user, now, ip))
     connection.commit()

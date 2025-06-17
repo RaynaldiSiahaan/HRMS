@@ -218,6 +218,7 @@ app.post('/api/joinus', (req, res) => {
 });
 
 // -------------------- GET EMPLOYEE PERFORMANCE --------------------
+// server.js (or your backend route file)
 app.get('/api/employee/performance', (req, res) => {
   const days = parseInt(req.query.days) || 7;
 
@@ -246,6 +247,7 @@ app.get('/api/employee/performance', (req, res) => {
     res.json(result);
   });
 });
+
 
 
 // -------------------- START SERVER --------------------

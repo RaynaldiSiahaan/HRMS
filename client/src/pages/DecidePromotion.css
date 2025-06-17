@@ -1,50 +1,42 @@
+/* src/pages/DecidePromotion.css */
+
 .promotion-container {
-  padding: 20px 40px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  max-width: 1100px;
+  margin: auto;
+  font-family: Arial, sans-serif;
 }
 
-.promotion-container h2 {
-  text-align: center;
+h2 {
   margin-bottom: 20px;
+  font-size: 1.6em;
+  font-weight: 600;
+  color: #333;
 }
 
 .filter-section {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   margin-bottom: 20px;
-  font-size: 16px;
+  font-size: 1em;
 }
 
-.filter-section label {
-  font-weight: 600;
-}
-
-.filter-section select {
-  padding: 6px 12px;
-  font-size: 15px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-table {
+.performance-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 15px;
-  text-align: center;
 }
 
-table thead {
-  background-color: #f5f5f5;
-  font-weight: bold;
-}
-
-table th,
-table td {
+.performance-table th,
+.performance-table td {
   border: 1px solid #ccc;
-  padding: 10px;
+  padding: 10px 12px;
+  text-align: left;
 }
 
-table tbody tr:nth-child(even) {
+.performance-table th {
+  background-color: #f2f2f2;
+  font-weight: 600;
+  color: #222;
+}
+
+.performance-table tr:nth-child(even) {
   background-color: #fafafa;
 }

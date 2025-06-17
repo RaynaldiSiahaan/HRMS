@@ -19,7 +19,7 @@ export default function RegisterFace() {
         username,
         image: imageSrc
       });
-      setMsg(res.data.error || `✅ Registered ${res.data.name}`);
+      setMsg(res.data.error || `✅ Registered ${res.data.userRole}`);
     } catch (err) {
   // 1) try your custom `error` field
   if (err.response?.data?.error) {

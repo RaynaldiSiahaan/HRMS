@@ -1,5 +1,7 @@
+// src/pages/AdminPage.js
+
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ add this
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './AdminPage.css';
 
@@ -7,7 +9,7 @@ const AdminPage = () => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const navigate = useNavigate(); // ✅ init
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios.get('http://localhost:5005/api/accounts')
@@ -34,8 +36,13 @@ const AdminPage = () => {
   };
 
   const handleLogout = () => {
-    localStorage.clear();  // clear tokens, etc.
-    navigate('/login');    // redirect to login
+    localStorage.clear();
+    navigate('/login');
+  };
+
+  const handleRegisterFace = (username) => {
+    localStorage.setItem('username', username);
+    navigate('/register-face');
   };
 
   return (
@@ -47,8 +54,7 @@ const AdminPage = () => {
           <a href="/add-account" className="add-account-link">Add Account</a>
         </div>
         <div className="links-right">
-          <a href="/attendance">Fill Attendance</a>
-          <a href="/fill-attendance">Register Face</a>
+          <a href="/fill-attendance">Fill Attendance</a>
           <a href="#" onClick={e => { e.preventDefault(); handleLogout(); }} className="logout-link">Logout</a>
         </div>
       </div>
@@ -70,7 +76,7 @@ const AdminPage = () => {
                   <th>Username</th>
                   <th>Email</th>
                   <th>Status</th>
-                  <th>Toggle Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -82,12 +88,18 @@ const AdminPage = () => {
                     <td>{account.Username}</td>
                     <td>{account.Email}</td>
                     <td>{account.IsActive ? 'Active' : 'Inactive'}</td>
-                    <td>
+                    <td className="action-buttons">
                       <button
                         className="toggle-btn"
                         onClick={() => toggleStatus(account.ID)}
                       >
                         {account.IsActive ? 'Deactivate' : 'Activate'}
+                      </button>
+                      <button
+                        className="register-face-btn"
+                        onClick={() => handleRegisterFace(account.Username)}
+                      >
+                        Register Face
                       </button>
                     </td>
                   </tr>

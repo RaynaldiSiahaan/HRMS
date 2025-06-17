@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './ManagerPage.css';
 
-const EmployeePage = () => {
+const ManagerPage = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -19,7 +19,7 @@ const EmployeePage = () => {
 
       <div className="employee-actions">
         <Link to="/employee-dashboard" className="employee-link">Dashboard</Link>
-        <Link to="/fill-attendance" className="employee-link">Fill Attendance</Link>
+        <Link to="/fill-attendance" className="employee-link">Fill Attendance</Link> {/* ✅ New Button */}
         <Link to="/decide-promotion" className="employee-link">Decide Promotion</Link>
         <Link to="/open-position-form" className="employee-link">Open New Position</Link>
         <button className="logout-btn" onClick={handleLogout}>Logout</button>
@@ -28,4 +28,4 @@ const EmployeePage = () => {
   );
 };
 
-export default EmployeePage;
+export default ManagerPage;

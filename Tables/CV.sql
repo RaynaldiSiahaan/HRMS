@@ -10,7 +10,6 @@ CREATE TABLE cv (
     org_experience_file VARCHAR(255) NOT NULL,
     profile_description_file VARCHAR(255) NOT NULL,
     other_experience_file VARCHAR(255) NOT NULL,
-    certificate_file VARCHAR(255) NOT NULL,
     submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

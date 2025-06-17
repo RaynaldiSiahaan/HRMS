@@ -77,11 +77,6 @@ const JoinUs = () => {
         <label>Other Experience:
           <textarea name="otherExperience" value={formData.otherExperience} onChange={handleChange} required />
         </label>
-
-        <label>Certificate:
-          <textarea name="certificate" value={formData.certificate} onChange={handleChange} required />
-        </label>
-
         <button type="submit">Submit Application</button>
       </form>
     </div>

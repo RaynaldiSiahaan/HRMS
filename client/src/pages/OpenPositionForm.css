@@ -1,0 +1,32 @@
+.employee-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40px;
+  font-family: Arial, sans-serif;
+}
+
+.employee-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 80%;
+  margin-bottom: 30px;
+}
+
+.employee-header h2 {
+  text-align: center;
+  flex-grow: 1;
+  margin: 0;
+  font-weight: bold;
+}
+
+.employee-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}

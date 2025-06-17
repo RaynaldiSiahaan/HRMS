@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './ManagerPage.css';
 
-const ManagerPage = () => {
+const EmployeePage = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -12,15 +12,20 @@ const ManagerPage = () => {
   };
 
   return (
-    <div className="manager-page">
-      <h2>Welcome Manager</h2>
-      <ul>
-        <li><Link to="/save-employee-file">Employee Performance</Link></li>
-        <li><Link to="/fill-attendance">Fill Attendance</Link></li>
-        <li><button onClick={handleLogout}>Logout</button></li>
-      </ul>
+    <div className="employee-container">
+      <div className="employee-header">
+        <h2>Welcome Manager</h2>
+      </div>
+
+      <div className="employee-actions">
+        <Link to="/employee-dashboard" className="employee-link">Dashboard</Link>
+        <Link to="/fill-attendance" className="employee-link">Fill Attendance</Link>
+        <Link to="/decide-promotion" className="employee-link">Decide Promotion</Link>
+        <Link to="/open-position-form" className="employee-link">Open New Position</Link>
+        <button className="logout-btn" onClick={handleLogout}>Logout</button>
+      </div>
     </div>
   );
 };
 
-export default ManagerPage;
+export default EmployeePage;

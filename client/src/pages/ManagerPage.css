@@ -1,48 +1,84 @@
-.manager-page {
-  max-width: 800px;
-  margin: 80px auto;
-  padding: 30px;
-  border-radius: 12px;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  text-align: center;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+.logout-btn {
+  padding: 6px 12px;
+  font-size: 14px;
+  margin-left: auto;
 }
 
-.manager-page h2 {
-  font-size: 28px;
-  margin-bottom: 30px;
-  color: #333;
-}
-
-.manager-page ul {
-  list-style: none;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  gap: 20px; /* spacing between items */
-  flex-wrap: wrap; /* wrap items on smaller screens */
-  margin: 0;
-}
-
-.manager-page li {
-  margin: 0;
-}
-
-.manager-page a,
-.manager-page button {
+.employee-link {
   text-decoration: none;
-  font-size: 16px;
-  padding: 10px 16px;
   color: white;
   background-color: #007bff;
+  font-weight: bold;
+  padding: 8px 16px;
   border: none;
-  border-radius: 8px;
+  border-radius: 4px;
+  transition: background-color 0.3s;
+}
+
+.employee-link:hover {
+  background-color: #0056b3;
+}
+
+.employee-dropdown {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 4px;
+}
+
+.employee-input {
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.form-container {
+  width: 100%;
+  max-width: 600px;
+  background-color: #f9f9f9;
+  padding: 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s;
 }
 
-.manager-page a:hover,
-.manager-page button:hover {
+.submit-btn:hover {
   background-color: #0056b3;
+}
+.logout-btn {
+  background-color: #007BFF; /* Bootstrap Blue */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logout-btn:hover {
+  background-color: #0056b3; /* darker blue on hover */
 }

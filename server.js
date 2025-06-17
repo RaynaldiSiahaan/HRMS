@@ -158,51 +158,95 @@ app.get('/api/protected', authenticateToken, (req, res) => {
 });
 
 // -------------------- JOIN US ROUTE (CV Upload) --------------------
-app.post('/api/joinus', upload.fields([
-  { name: 'workExperience' },
-  { name: 'schoolExperience' },
-  { name: 'organizationalExperience' },
-  { name: 'profileDescription' },
-  { name: 'otherExperience' },
-  { name: 'certificate' },
-]), (req, res) => {
-  const { fullName, address } = req.body;
-  const files = req.files;
+app.post('/api/joinus', (req, res) => {
+  const {
+    fullName,
+    birthDate,
+    gender,
+    workExperience,
+    schoolExperience,
+    orgExperience,
+    profileDescription,
+    otherExperience,
+    certificate
+  } = req.body;
 
-  if (!fullName || !address || !files) {
-    return res.status(400).json({ message: 'Missing required fields or files' });
+  console.log('🛠 Incoming CV:', req.body);
+
+  if (!fullName || !birthDate || !gender || !workExperience || !schoolExperience ||
+      !orgExperience || !profileDescription || !otherExperience || !certificate) {
+    return res.status(400).json({ message: 'Missing required fields' });
   }
 
   const sql = `
     INSERT INTO cv (
       full_name,
-      address,
-      work_experience,
-      school_experience,
-      organizational_experience,
-      profile_description,
-      other_experience,
-      certificate
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      birth_date,
+      gender,
+      work_experience_file,
+      school_experience_file,
+      org_experience_file,
+      profile_description_file,
+      other_experience_file,
+      certificate_file
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-  db.query(sql, [
+  const values = [
     fullName,
-    address,
-    files.workExperience?.[0]?.buffer || null,
-    files.schoolExperience?.[0]?.buffer || null,
-    files.organizationalExperience?.[0]?.buffer || null,
-    files.profileDescription?.[0]?.buffer || null,
-    files.otherExperience?.[0]?.buffer || null,
-    files.certificate?.[0]?.buffer || null,
-  ], (err, result) => {
+    birthDate,
+    gender,
+    workExperience,
+    schoolExperience,
+    orgExperience,
+    profileDescription,
+    otherExperience,
+    certificate
+  ];
+
+  console.log('📄 Running SQL:', sql);
+  console.log('📦 With values:', values);
+
+  db.query(sql, values, (err, result) => {
     if (err) {
-      console.error('Insert error:', err);
-      return res.status(500).json({ message: 'Failed to submit application', error: err });
+      console.error('❌ Database error:', err);
+      return res.status(500).json({ message: 'Failed to submit CV', error: err });
     }
-    res.status(201).json({ message: 'Application submitted successfully' });
+    console.log('✅ Insert result:', result);
+    res.status(201).json({ message: 'CV submitted successfully' });
   });
 });
+
+// -------------------- GET EMPLOYEE PERFORMANCE --------------------
+app.get('/api/employee/performance', (req, res) => {
+  const days = parseInt(req.query.days) || 7;
+
+  const sql = `
+    SELECT
+      username,
+      fullName,
+      Attendance,
+      WorkCompletion,
+      LateCompletion,
+      satisfaction_score,
+      CASE
+        WHEN Attendance >= 90 AND WorkCompletion >= 85 AND satisfaction_score >= 4.0 THEN 'Highly Recommended'
+        WHEN Attendance >= 75 AND WorkCompletion >= 70 THEN 'Consider'
+        ELSE 'Not Recommended'
+      END AS recommendation
+    FROM employeeperf
+    WHERE UpdatedAt >= DATE_SUB(NOW(), INTERVAL ? DAY)
+  `;
+
+  db.query(sql, [days], (err, result) => {
+    if (err) {
+      console.error('Error fetching performance data:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(result);
+  });
+});
+
 
 // -------------------- START SERVER --------------------
 app.listen(PORT, () => {

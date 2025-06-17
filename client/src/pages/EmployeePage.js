@@ -1,9 +1,8 @@
-// src/pages/EmployeePage.js
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import './Employee.css';
+import './EmployeePage.css';
 
-const EmployeePage = () => {
+const ManagerPage = () => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -13,26 +12,14 @@ const EmployeePage = () => {
   };
 
   return (
-    <div className="employee-container">
-      <div className="employee-header">
-        <h2>Welcome Employee</h2>
-        <button onClick={handleLogout}>Logout</button>
-      </div>
-
-      <table className="employee-table">
-        <thead>
-          <tr>
-            <th>Option</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><Link to="/fill-attendance" className="action-button view">Fill Attendance</Link></td>
-          </tr>
-        </tbody>
-      </table>
+    <div className="manager-page">
+      <h2>Welcome Employee</h2>
+      <ul>
+        <li><Link to="/fill-attendance">Fill Attendance</Link></li>
+        <li><button onClick={handleLogout}>Logout</button></li>
+      </ul>
     </div>
   );
 };
 
-export default EmployeePage;
+export default ManagerPage;

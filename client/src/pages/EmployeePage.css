@@ -1,0 +1,48 @@
+.manager-page {
+  max-width: 800px;
+  margin: 80px auto;
+  padding: 30px;
+  border-radius: 12px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.manager-page h2 {
+  font-size: 28px;
+  margin-bottom: 30px;
+  color: #333;
+}
+
+.manager-page ul {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  gap: 20px; /* spacing between items */
+  flex-wrap: wrap; /* wrap items on smaller screens */
+  margin: 0;
+}
+
+.manager-page li {
+  margin: 0;
+}
+
+.manager-page a,
+.manager-page button {
+  text-decoration: none;
+  font-size: 16px;
+  padding: 10px 16px;
+  color: white;
+  background-color: #007bff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.manager-page a:hover,
+.manager-page button:hover {
+  background-color: #0056b3;
+}

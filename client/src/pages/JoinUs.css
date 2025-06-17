@@ -1,24 +1,58 @@
+/* src/components/JoinUs.css */
 .joinus-container {
-  padding: 20px;
-  max-width: 600px;
-  margin: auto;
-  background: #f9f9f9;
-  border-radius: 8px;
+  padding: 30px;
+  max-width: 700px;
+  margin: 40px auto;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.joinus-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #333;
 }
 
 .joinus-form label {
   display: block;
-  margin-bottom: 10px;
+  margin-bottom: 18px;
+  font-weight: 500;
+  color: #444;
 }
 
-.joinus-form input {
+.joinus-form input,
+.joinus-form textarea {
   width: 100%;
-  margin-top: 4px;
-  padding: 8px;
+  margin-top: 6px;
+  padding: 10px;
   box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+  background-color: #fdfdfd;
+}
+
+.joinus-form textarea {
+  min-height: 80px;
+  resize: vertical;
 }
 
 .joinus-form button {
-  margin-top: 20px;
-  padding: 10px 20px;
+  display: block;
+  margin: 30px auto 0;
+  padding: 12px 30px;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.joinus-form button:hover {
+  background-color: #0056b3;
 }

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ add this
 import axios from 'axios';
 import './AdminPage.css';
 
@@ -6,9 +7,9 @@ const AdminPage = () => {
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate(); // ✅ init
 
   useEffect(() => {
-    // Fetch accounts data from backend
     axios.get('http://localhost:5005/api/accounts')
       .then(response => {
         setAccounts(response.data);
@@ -23,7 +24,6 @@ const AdminPage = () => {
   const toggleStatus = (id) => {
     axios.put(`http://localhost:5005/api/accounts/${id}/status`)
       .then(() => {
-        // Refresh accounts after status toggle
         setAccounts(prev =>
           prev.map(acc =>
             acc.ID === id ? { ...acc, IsActive: acc.IsActive ? 0 : 1 } : acc
@@ -31,6 +31,11 @@ const AdminPage = () => {
         );
       })
       .catch(() => alert('Failed to update status'));
+  };
+
+  const handleLogout = () => {
+    localStorage.clear();  // clear tokens, etc.
+    navigate('/login');    // redirect to login
   };
 
   return (
@@ -44,7 +49,7 @@ const AdminPage = () => {
         <div className="links-right">
           <a href="/attendance">Fill Attendance</a>
           <a href="/fill-attendance">Register Face</a>
-          <a href="/logout">Logout</a>
+          <a href="#" onClick={e => { e.preventDefault(); handleLogout(); }} className="logout-link">Logout</a>
         </div>
       </div>
 

@@ -12,21 +12,37 @@ export default function Attendance() {
     const src = webcamRef.current.getScreenshot()
     setImageSrc(src)
 
+    const username = localStorage.getItem("username") // Must be the exact username from account table
+    const role = localStorage.getItem("userRole") // Should be: "Admin", "Employee", or "Manager"
+
+    if (!username || !role) {
+      setMsg("User is not logged in. Please log in first.")
+      return
+    }
+
+    console.log("Sending attendance for:", { username, role, action })
+
     try {
       const { data } = await axios.post('http://localhost:8000/api/attendance', {
         image: src,
-        action: action  // either 'clock_in' or 'clock_out'
+        action: action,
+        username: username,
+        role: role
       })
-      setMsg(`${data.username} ${action === 'clock_in' ? 'clocked in' : 'clocked out'} successfully at ${data.time}`)
+
+      setMsg(`${role} ${action === 'clock_in' ? 'clocked in' : 'clocked out'} successfully at ${data.time}`)
       setBox(data.box)
     } catch (err) {
-      setMsg(err.response?.data?.error || 'Error')
+      console.error(err.response)
+      setMsg(err.response?.data?.detail || 'Error marking attendance')
       setBox(null)
     }
   }
 
   return (
     <div>
+      <h2>Face Recognition Attendance</h2>
+
       <div style={{ position: 'relative', width: 320, height: 240 }}>
         <Webcam
           audio={false}

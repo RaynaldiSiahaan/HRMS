@@ -219,34 +219,34 @@ app.post('/api/joinus', (req, res) => {
 
 // -------------------- GET EMPLOYEE PERFORMANCE --------------------
 // server.js (or your backend route file)
-app.get('/api/employee/performance', (req, res) => {
-  const days = parseInt(req.query.days) || 7;
+// app.get('/api/employee/performance', (req, res) => {
+//   const days = parseInt(req.query.days) || 7;
 
-  const sql = `
-    SELECT
-      username,
-      fullName,
-      Attendance,
-      WorkCompletion,
-      LateCompletion,
-      satisfaction_score,
-      CASE
-        WHEN Attendance >= 90 AND WorkCompletion >= 85 AND satisfaction_score >= 4.0 THEN 'Highly Recommended'
-        WHEN Attendance >= 75 AND WorkCompletion >= 70 THEN 'Consider'
-        ELSE 'Not Recommended'
-      END AS recommendation
-    FROM employeeperf
-    WHERE UpdatedAt >= DATE_SUB(NOW(), INTERVAL ? DAY)
-  `;
+//   const sql = `
+//     SELECT
+//       username,
+//       fullName,
+//       Attendance,
+//       WorkCompletion,
+//       LateCompletion,
+//       satisfaction_score,
+//       CASE
+//         WHEN Attendance >= 90 AND WorkCompletion >= 85 AND satisfaction_score >= 4.0 THEN 'Highly Recommended'
+//         WHEN Attendance >= 75 AND WorkCompletion >= 70 THEN 'Consider'
+//         ELSE 'Not Recommended'
+//       END AS recommendation
+//     FROM employeeperf
+//     WHERE UpdatedAt >= DATE_SUB(NOW(), INTERVAL ? DAY)
+//   `;
 
-  db.query(sql, [days], (err, result) => {
-    if (err) {
-      console.error('Error fetching performance data:', err);
-      return res.status(500).json({ error: 'Database error' });
-    }
-    res.json(result);
-  });
-});
+//   db.query(sql, [days], (err, result) => {
+//     if (err) {
+//       console.error('Error fetching performance data:', err);
+//       return res.status(500).json({ error: 'Database error' });
+//     }
+//     res.json(result);
+//   });
+// });
 
 
 

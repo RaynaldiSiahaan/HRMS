@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Query, Body
 import pickle
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
@@ -8,7 +8,12 @@ import io
 from PIL import Image
 import numpy as np
 import pymysql.cursors
+import pandas as pd
+import joblib
 from datetime import datetime
+from transformers import BertForSequenceClassification, BertTokenizerFast
+import torch
+
 
 app = FastAPI()
 
@@ -29,12 +34,20 @@ connection = pymysql.connect(
     cursorclass=pymysql.cursors.DictCursor
 )
 
+class MatchCVRequest(BaseModel):
+    position: str
+    min_age: int
+    max_age: int
+    gender: str
+    education: str
+    
 # Pydantic models for incoming requests
 class RegisterRequest(BaseModel):
     username: str
     image: str  # base64 image
 
 class AttendanceRequest(BaseModel):
+    username: str
     image: str
     action: str  # "clock_in" or "clock_out"
 
@@ -87,27 +100,26 @@ def mark_attendance(req: AttendanceRequest, request: Request):
 
     face_encoding = encs[0]
 
-    # Load known face encodings from database
+    # Only load the face encoding for this username
     with connection.cursor() as cur:
-        cur.execute("SELECT username, encoding FROM face_data")
-        rows = cur.fetchall()
+        cur.execute("SELECT encoding FROM face_data WHERE username = %s", (req.username,))
+        row = cur.fetchone()
 
-    usernames, encodings = [], []
-    for r in rows:
-        usernames.append(r["username"])
-        encodings.append(pickle.loads(r["encoding"]))
+    if not row:
+        raise HTTPException(404, "Face data not found for this username")
 
-    # Compare input face with stored faces
-    dists = face_recognition.face_distance(encodings, face_encoding)
-    best_idx = np.argmin(dists)
-    if dists[best_idx] >= 0.6:
-        raise HTTPException(401, "Unknown face")
+    stored_encoding = pickle.loads(row["encoding"])
 
-    username = usernames[best_idx]
+    # Compare input face with user's stored face
+    dist = face_recognition.face_distance([stored_encoding], face_encoding)[0]
+    if dist >= 0.6:
+        raise HTTPException(401, "Face does not match for user")
+
+    username = req.username
     now = datetime.utcnow()
     ip = request.client.host
 
-    # Get user role from account table
+    # Get user role and full name from account table
     with connection.cursor() as cur:
         cur.execute("SELECT role, fullName FROM account WHERE username = %s", (username,))
         row = cur.fetchone()
@@ -117,13 +129,13 @@ def mark_attendance(req: AttendanceRequest, request: Request):
         full_name = row["fullName"]
 
         if req.action == 'clock_in':
-            # Insert attendance record
+            # Insert clock-in record
             cur.execute("""
                 INSERT INTO attendance (username, clocked_in_time, ip_location)
                 VALUES (%s, %s, %s)
             """, (username, now, ip))
 
-            # Ensure user exists in performance table
+            # Ensure the user exists in the performance table
             cur.execute("SELECT 1 FROM employeeperf WHERE username = %s", (username,))
             if not cur.fetchone():
                 cur.execute("""
@@ -173,3 +185,134 @@ def mark_attendance(req: AttendanceRequest, request: Request):
 
         else:
             raise HTTPException(400, "Invalid action. Use 'clock_in' or 'clock_out'")
+
+        
+
+@app.get("/api/employee/performance")
+def predict_promotions(days: int = Query(7)):
+    try:
+        model_path = f"./models/lgbm_model_{days}days.joblib"
+        encoder_path = f"./models/label_encoder_{days}days.joblib"
+
+        model = joblib.load(model_path)
+        encoder = joblib.load(encoder_path)
+
+        with connection.cursor() as cur:
+            cur.execute("SELECT username, fullName, Attendance, WorkCompletion, LateCompletion, satisfaction_score FROM employeeperf")
+            rows = cur.fetchall()
+
+        df = pd.DataFrame(rows)
+        if df.empty:
+            return []
+
+        # 🛠 Fix dtypes
+        df['Attendance'] = pd.to_numeric(df['Attendance'], errors='coerce')
+        df['WorkCompletion'] = pd.to_numeric(df['WorkCompletion'], errors='coerce')
+        df['LateCompletion'] = pd.to_numeric(df['LateCompletion'], errors='coerce')
+        df['satisfaction_score'] = pd.to_numeric(df['satisfaction_score'], errors='coerce')
+
+        df = df.dropna(subset=['Attendance', 'WorkCompletion', 'LateCompletion', 'satisfaction_score'])
+
+        X = df[['Attendance', 'WorkCompletion', 'LateCompletion', 'satisfaction_score']]
+        predictions = model.predict(X)
+        labels = encoder.inverse_transform(predictions)
+
+        df['recommendation'] = labels
+
+        return df.to_dict(orient="records")
+
+    except Exception as e:
+        import traceback
+        print("❌ Error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
+
+def infer_education_level(text):
+    if not isinstance(text, str):
+        return None
+
+    text = text.lower()
+
+    if any(k in text for k in ["phd", "doctor", "doctoral", "dr.", "d.phil", "ed.d", "sc.d"]):
+        return "Doctoral"
+    elif any(k in text for k in ["master", "m.sc", "msc", "mba", "magister"]):
+        return "Master"
+    elif any(k in text for k in ["bachelor", "b.sc", "bsc", "undergraduate"]):
+        return "Bachelor"
+    elif any(k in text for k in ["high school", "secondary school", "gcse", "sma"]):
+        return "HighSchool"
+    return None
+
+@app.post("/api/match-cvs")
+def match_cvs(req: MatchCVRequest
+):
+    position = req.position
+    min_age = req.min_age
+    max_age = req.max_age
+    gender = req.gender
+    education = req.education
+
+    # Load models and encoders
+    job_model = BertForSequenceClassification.from_pretrained(
+    "job_classifier_bert",)
+
+
+    tokenizer = BertTokenizerFast.from_pretrained("bert-base-uncased")
+
+    with open("label_encoder.pkl", "rb") as f:
+        job_encoder = pickle.load(f)
+
+
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    job_model.to(device).eval()
+
+    def predict(model, text, encoder):
+        inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512)
+        inputs = {k: v.to(device) for k, v in inputs.items()}
+        with torch.no_grad():
+            logits = model(**inputs).logits
+            pred = logits.argmax(-1).item()
+        return encoder.inverse_transform([pred])[0]
+
+    def calculate_age(birth_date):
+        birth = datetime.strptime(str(birth_date), "%Y-%m-%d")
+        today = datetime.today()
+        return today.year - birth.year - ((today.month, today.day) < (birth.month, birth.day))
+
+    with connection.cursor() as cur:
+        cur.execute("SELECT * FROM cv")
+        rows = cur.fetchall()
+
+    matches = []
+    for row in rows:
+        if not row["birth_date"]:
+            continue
+
+        age = calculate_age(row["birth_date"])
+        if not (min_age <= age <= max_age):
+            continue
+        if row["gender"].lower() != gender.lower():
+            continue
+
+        # Build CV text
+        full_text = " ".join([
+            row.get("work_experience_file", ""),
+            row.get("school_experience_file", ""),
+            row.get("org_experience_file", ""),
+            row.get("profile_description_file", ""),
+            row.get("other_experience_file", "")
+        ])
+
+        predicted_job = predict(job_model, full_text, job_encoder)
+        predicted_edu = infer_education_level(row.get("school_experience_file", ""))
+
+
+        if predicted_job == position and predicted_edu == education:
+            matches.append({
+                "full_name": row["full_name"],
+                "gender": row["gender"],
+                "birth_date": row["birth_date"],
+                "predicted_job": predicted_job,
+                "predicted_education": predicted_edu
+            })
+
+    return matches[:10]

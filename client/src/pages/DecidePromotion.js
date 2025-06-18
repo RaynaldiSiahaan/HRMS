@@ -10,7 +10,7 @@ const DecidePromotion = () => {
   useEffect(() => {
     const fetchPerformance = async () => {
       try {
-        const res = await fetch(`http://localhost:5005/api/employee/performance?days=${filter}`);
+        const res = await fetch(`http://localhost:8000/api/employee/performance?days=${filter}`);
         const json = await res.json();
 
         if (Array.isArray(json)) {
